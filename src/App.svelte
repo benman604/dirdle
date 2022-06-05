@@ -3,9 +3,8 @@
 	import { scale } from 'svelte/transition';
 	import WordGrid from './WordGrid'
 	import Keyboard from './Keyboard.svelte'
-	import Allwords from './words.js'
 	import Bank from './wordbank.js'
-	// import AlanAI from './AlanAI.svelte'
+	import Popover from './Popover.svelte'
 
 
 	let word = ""
@@ -122,7 +121,30 @@
 	function togglePracticeMode(){
 		practiceMode = !practiceMode
 	}
+
+	let showInfo = true
+	if(window.localStorage.getItem("first") === null){
+		window.localStorage.setItem("first", "true")
+	} else{
+		showInfo = false
+	}
+	$:{
+		console.log(showInfo)
+	}
 </script>
+
+
+<Popover bind:state={showInfo}>
+	<p>Welcome to dirdle, a directional word guessing game based on Wordle.</p>
+	<ul>
+		<li>If a letter has a grey [?], you know it's either in the correct place or is not in the word at all.</li>
+		<ul>
+			<li>Click a [?] to reveal a hint. If that letter turns green, it's in the right place. If it turns black, it's not in the word at all.</li>
+			<li>You can reveal up to 5 hints that turn black.</li>
+		</ul>
+		<li>If a letter has a yellow arrow, it exists somewhere in the word in that respective direction.</li>
+	</ul>
+</Popover>
 
 <div class="message">
 	<h1>dirdle</h1> 
@@ -152,8 +174,8 @@
 </div>
 
 <div class="under">
-	<a href="#4">Github</a>
-	<a href="#3">Original</a>
+	<a href="https://github.com/benman604/dirdle">Github</a>
+	<a href="#3" id="helpbtn" on:click={()=>{showInfo = true}}>Help</a>
 	<div class="right">
 		<small>To use a hint, click a [?]</small>
 	</div>

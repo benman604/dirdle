@@ -1,8 +1,12 @@
-# Svelte Wordle
+# dirdle
 
-A simple Wordle clone written in Svelte.
+Directional wordle. Tells you which direction a letter is located, but does not tell if a letter either is in the right place or is not even in the word.
 
-![screenshot](wordle-sc-2.png)
+![screenshot](sc1.png)
+
+![screenshot](sc2.png)
+
+Click a [?] to reveal if the letter is in the right place or not in the word. You get up to 5 incorrect guesses
 
 ## Get started
 
