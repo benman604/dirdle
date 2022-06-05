@@ -4,14 +4,18 @@
 	import WordGrid from './WordGrid'
 	import Keyboard from './Keyboard.svelte'
 	import Allwords from './words.js'
-	import AlanAI from './AlanAI.svelte'
+	import Bank from './wordbank.js'
+	// import AlanAI from './AlanAI.svelte'
 
 
 	let word = ""
 	let state = 0
 	let tries = word.length
 	let results = []
-	let shareResultsContent = "Svelte-AlanAI-Wordle "
+	let numHints = 5
+	let usedHints = []
+	let finished = false
+	let shareResultsContent = "Dirdle "
 
 	window["keypress"] = []
 	window["keycolor"] = []
@@ -48,6 +52,7 @@
 	}
 
 	function buildResultContent(){
+		finished = true
 		let score = (state == "win") ? (window["keycolor"].length) : "X"
 		shareResultsContent += score + "/6 \n"
 		for(let row of window["keycolor"]){
@@ -97,54 +102,103 @@
 
 	onMount(() => {
 		if(word == ""){
-			let aw = Allwords.split("\n")
+			let aw = Bank.split("\n")
 			word = aw[randInt(0, aw.length)]
-			//word = randomWords({maxLength: 7, minLength: 5, exactly: 1})[0]
 			console.log(word)
-			tries = word.length + 1
+			tries = word.length + 2
 			state = 0
 			results = []
 		}
 	})
+
+	let markupMode = false
+	let selectedColor = "black"
+	let selectableColors = ["black", "green", "orange"]
+	function toggleMarkupMode(){
+		markupMode = !markupMode
+	}
+
+	let practiceMode = false
+	function togglePracticeMode(){
+		practiceMode = !practiceMode
+	}
 </script>
 
-<main>
-	<div class="message">
-		<h1>WORDLE</h1> 
-		<a href="https://github.com/benman604/Wordle">Github</a> 
-		<a href="https://www.powerlanguage.co.uk/wordle/">Original</a>
-		<br><br>
-		{#if message != ""}
-			<strong transition:scale>{message}</strong>
-		{:else}
-			<p></p>
-		{/if}
-		{#if state == "win"}
-			<div transition:scale>
-				<strong>You won!</strong>
-				<button on:click={copyResults}>{shareBtnContent}</button>
-				<button on:click={()=>{window.location.reload()}}>New Game</button>
-			</div>
-		{/if}
+<div class="message">
+	<h1>dirdle</h1> 
+	{#if message != ""}
+		<strong transition:scale>{message}</strong>
+	{/if}
+	{#if state == "win"}
+		<div transition:scale>
+			<strong>You won!</strong>
+			<button on:click={copyResults}>{shareBtnContent}</button>
+			<button on:click={()=>{window.location.reload()}}>New Game</button>
+		</div>
+	{/if}
 
-		{#if state == "lose"}
-			<div transition:scale>
-				<strong>You lost!</strong>
-				<p>The word was {word}.</p>
-				<button transition:scale on:click={copyResults}>{shareBtnContent}</button>
-				<button on:click={()=>{window.location.reload()}}>New Game</button>
-			</div>
-		{/if}
+	{#if state == "lose"}
+		<div transition:scale>
+			<strong>You lost!</strong>
+			<p>The word was {word}.</p>
+			<button transition:scale on:click={copyResults}>{shareBtnContent}</button>
+			<button on:click={()=>{window.location.reload()}}>New Game</button>
+		</div>
+	{/if}
+
+	<div class="right">
+		<strong>{numHints}/5 hints remaining</strong>
 	</div>
+</div>
+
+<div class="under">
+	<a href="#4">Github</a>
+	<a href="#3">Original</a>
+	<div class="right">
+		<small>To use a hint, click a [?]</small>
+	</div>
+</div>
+
+<div class="bottom" style="left: 10px;">
+	{#if markupMode}
+		<div>
+			{#each selectableColors as scl}
+				<button on:click={()=>{selectedColor = scl}}
+					style={'color:' + scl + '; font-size:' + ((selectedColor == scl) ? 'x-large' : 'medium')}>⬤</button>
+			{/each}
+		</div>
+	{/if}
+	<button style="{
+		(!markupMode) ? 'background-color:white; font-weight:bolder' : ''
+		}"
+	on:click={toggleMarkupMode}>Type</button>
+	<button style="{
+		(markupMode) ? 'background-color:white; font-weight:bolder' : ''
+		}"
+	on:click={toggleMarkupMode}>Mark</button>
+</div>
+<!-- 
+<div class="bottom right" style="right: 10px">
+	<button style="{
+		(!practiceMode) ? 'background-color:white; font-weight:bolder' : ''
+		}"
+	on:click={togglePracticeMode}>Daily</button>
+	<button style="{
+		(practiceMode) ? 'background-color:white; font-weight:bolder' : ''
+		}; margin-right: 4px"
+	on:click={togglePracticeMode}>Practice</button>
+</div> -->
+
+<main>
 	<br>
 	<table>
 		{#each {length: tries} as _, i}
-			<WordGrid state={getState(i, state)} correct={word} on:message={handleMessage}/>
+			<WordGrid state={getState(i, state)} correct={word} bind:numhints={numHints} bind:usedHints={usedHints} bind:finished={finished} on:message={handleMessage}/>
 		{/each}
 	</table>
 
-	<Keyboard on:keyclick={handleKeyclick} />
-	<AlanAI on:message={handleMessage} correct={word} bind:state={state}/>
+	<Keyboard on:keyclick={handleKeyclick} bind:markupMode={markupMode} bind:selectedColor={selectedColor}/>
+	<!-- <AlanAI on:message={handleMessage} correct={word} bind:state={state}/> -->
 </main>
 
 <style>
@@ -154,33 +208,39 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
+
 	}
 
-	.message *{
+	.message *, .under *{
 		margin-right: 10px;
+		margin-left: 10px;
 		display: inline;
 	}
+	.message{
+		width: 100%;
+	}
 
-	@media only screen and (max-width: 600px), (max-height: 900px){
-		main{
-			width: 100%;
-			top: 50px;
-			left: 50%;
-			transform: translate(-50%, 0);
-		}
+	.bottom{
+		bottom:5px; 
+		position:absolute;
+	}
+
+	@media only screen and (max-width: 600px), (max-height: 800px){
 		table{
 			margin-left: auto;
 			margin-right: auto;
 		}
-		.message{
-			text-align: center;
+		h1{
+			font-size: x-large;
 		}
-
-		/* center buttons inside main */
-		/* button{
-			margin-left: auto;
-			margin-right: auto;
-			position: absolute;
-		} */
+		main{
+			margin-top: 50px;
+		}
 	}
+
+	@media only screen and (max-height: 600px){
+		h1 {
+			font-size: large;
+		}
+    }
 </style>

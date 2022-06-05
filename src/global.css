@@ -62,12 +62,16 @@ button:focus {
 	border-color: #666;
 }
 
+.right *{
+	float: right;
+}
+
 .black{
 	background-color: black;
 	color: white;
 }
 
-.yellow{
+.yellow, .orange{
 	background-color: yellow;
 	color: black !important;
 }

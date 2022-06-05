@@ -1,4 +1,6 @@
 <script>
+    export let markupMode = false;
+    export let selectedColor = "black"
     let keys = [
         "qwertyuiop",
         "asdfghjkl",
@@ -12,6 +14,17 @@
         if(key == "→"){
             key = "Enter"
         }
+        if(markupMode){
+            if(key == "Enter" || key == "Backspace"){
+                return
+            }
+            if(selectedColor == keycolors[key]){
+                keycolors[key] = ""
+            } else{
+                keycolors[key] = selectedColor
+            }
+            return
+        }
         for(let fn of window["keypress"]){
             fn({key: key})
         }
@@ -19,6 +32,7 @@
 
     let keycolors = {}
     function updateKeyboard(colors){
+        console.log(keycolors)
         for(let i of Object.keys(colors)){
             for(let j of colors[i]){
                 keycolors[j] = i
@@ -57,5 +71,29 @@
     }
     main{
         margin-bottom: 50px;
+    }
+    @media only screen and (max-width: 600px), (max-height: 600px){
+        .row button{
+            width: 32px;
+            height: 32px;
+        }
+    }
+
+    .greenorblack{
+	    background-image: url("images/unknown.png"), linear-gradient(#e9e9e9c7, #e9e9e9c7);
+        background-size: cover;
+        color: black;
+    }
+
+    .somewhere-left{
+        background-image: url("images/left-trig.png"), linear-gradient(#ffffff, #ffffff);
+        background-size: cover;
+        color: black;
+    }
+
+    .somewhere-right{
+        background-image: url("images/right-trig.png"), linear-gradient(#ffffff, #ffffff);
+        background-size: cover;
+        color: black
     }
 </style>
