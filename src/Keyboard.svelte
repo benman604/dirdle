@@ -32,7 +32,7 @@
 
     let keycolors = {}
     function updateKeyboard(colors){
-        console.log(keycolors)
+        // console.log(keycolors)
         for(let i of Object.keys(colors)){
             for(let j of colors[i]){
                 keycolors[j] = i

@@ -14,7 +14,7 @@
 	let numHints = 5
 	let usedHints = []
 	let finished = false
-	let shareResultsContent = "Dirdle "
+	let shareResultsContent = "dirdle "
 
 	window["keypress"] = []
 	window["keycolor"] = []
@@ -46,14 +46,14 @@
 	}
 
 	function handleKeyclick(event){
-		console.log(event.detail.key)
+		// console.log(event.detail.key)
 		return {key: event.detail.key}
 	}
 
 	function buildResultContent(){
 		finished = true
 		let score = (state == "win") ? (window["keycolor"].length) : "X"
-		shareResultsContent += score + "/6 \n"
+		shareResultsContent += score + "/7 \n"
 		for(let row of window["keycolor"]){
 			for(let color of row){
 				if(color == "black"){
@@ -68,6 +68,8 @@
 			}
 			shareResultsContent += "\n"
 		}
+
+		shareResultsContent += "https://dirdle.vercel.app/"
 	}
 
 	let shareBtnContent = "Share"
@@ -103,6 +105,10 @@
 		if(word == ""){
 			let aw = Bank.split("\n")
 			word = aw[randInt(0, aw.length)]
+			
+			// TODO: remove test
+			word = "elite"
+
 			console.log(word)
 			tries = word.length + 2
 			state = 0
@@ -128,9 +134,6 @@
 	} else{
 		showInfo = false
 	}
-	$:{
-		console.log(showInfo)
-	}
 </script>
 
 
@@ -148,30 +151,34 @@
 
 <div class="message">
 	<h1>dirdle</h1> 
-	{#if message != ""}
-		<strong transition:scale>{message}</strong>
-	{/if}
-	{#if state == "win"}
-		<div transition:scale>
-			<strong>You won!</strong>
-			<button on:click={copyResults}>{shareBtnContent}</button>
-			<button on:click={()=>{window.location.reload()}}>New Game</button>
-		</div>
-	{/if}
-
-	{#if state == "lose"}
-		<div transition:scale>
-			<strong>You lost!</strong>
-			<p>The word was {word}.</p>
-			<button transition:scale on:click={copyResults}>{shareBtnContent}</button>
-			<button on:click={()=>{window.location.reload()}}>New Game</button>
-		</div>
-	{/if}
-
 	<div class="right">
 		<strong>{numHints}/5 hints remaining</strong>
 	</div>
 </div>
+
+<Popover state={message != "" || state == "win" || state == "lose"} closeButton={state == "win" || state == "lose"}>
+	<!-- <div class="message"> -->
+		{#if message != ""}
+			<strong transition:scale>{message}</strong>
+		{/if}
+		{#if state == "win"}
+			<div transition:scale>
+				<strong>You won!</strong> <br> <br>
+				<button on:click={copyResults}>{shareBtnContent}</button> 
+				<button on:click={()=>{window.location.reload()}}>New Game</button>
+			</div>
+		{/if}
+
+		{#if state == "lose"}
+			<div transition:scale>
+				<strong>You lost!</strong>
+				<p>The word was {word}.</p>
+				<button transition:scale on:click={copyResults}>{shareBtnContent}</button>
+				<button on:click={()=>{window.location.reload()}}>New Game</button>
+			</div>
+		{/if}
+	<!-- </div> -->
+</Popover>
 
 <div class="under">
 	<a href="https://github.com/benman604/dirdle">Github</a>
@@ -199,17 +206,6 @@
 		}"
 	on:click={toggleMarkupMode}>Mark</button>
 </div>
-<!-- 
-<div class="bottom right" style="right: 10px">
-	<button style="{
-		(!practiceMode) ? 'background-color:white; font-weight:bolder' : ''
-		}"
-	on:click={togglePracticeMode}>Daily</button>
-	<button style="{
-		(practiceMode) ? 'background-color:white; font-weight:bolder' : ''
-		}; margin-right: 4px"
-	on:click={togglePracticeMode}>Practice</button>
-</div> -->
 
 <main>
 	<br>

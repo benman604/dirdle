@@ -29,12 +29,26 @@
             return "greenorblack"
         }
         if(color[i] == "yellow"){
+            if(usedHints.map((e) => {return e.char}).includes(word[i])){
+                for(let hint of usedHints){
+                    let nHintsRevealed = countChar(usedHints.map((e) => {return e.char}).join(), hint.char)
+                    let nHintInCorrect = countChar(correct, hint.char)
+
+                    console.log(nHintsRevealed + "/" + nHintInCorrect + " for " + hint.char)
+
+                    if(nHintsRevealed >= nHintInCorrect){
+                        return "cursor"
+                    }
+                }
+            }
+
             let cindex = 0
             for(let j=0; j<correct.length; j++){
-                if(correct[j] == word[i]){
+                if(correct[j] == word[i] && !usedHints.map((e) => {return e.index}).includes(j)){
                     cindex = j
                 }
             }
+
             if(i < cindex){
                 return "somewhere-right"
             } 
