@@ -29,6 +29,8 @@
             return "greenorblack"
         }
         if(color[i] == "yellow"){
+            console.log(usedHints)
+            console.log("word i" + word[i])
             if(usedHints.map((e) => {return e.char}).includes(word[i])){
                 for(let hint of usedHints){
                     let nHintsRevealed = countChar(usedHints.map((e) => {return e.char}).join(), hint.char)
@@ -44,8 +46,13 @@
 
             let cindex = 0
             for(let j=0; j<correct.length; j++){
-                if(correct[j] == word[i] && !usedHints.map((e) => {return e.index}).includes(j)){
+                if(correct[j] == word[i]){
                     cindex = j
+                }
+                for(let hint in usedHints) {
+                    if(!(hint.index == j && !correct.includes(hint.char)) && correct[j] == word[i]) {
+                        cindex = j
+                    }
                 }
             }
 
@@ -91,7 +98,11 @@
     function updateKeyboardColors(){
         let reformatedColors = {"black": [], "yellow": [], "green": [], "greenorblack": [], "somewhere-right": [], "somewhere-left": []}
         for(let i = 0; i < word.length; i++){
-            reformatedColors[getColor(i)].push(word[i])
+            try {
+                reformatedColors[getColor(i)].push(word[i])
+            } catch (error) {
+                console.log(error)
+            }
         }
         window["updateKeyboard"](reformatedColors)
     }

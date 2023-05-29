@@ -107,7 +107,7 @@
 			word = aw[randInt(0, aw.length)]
 
 			// TODO: remove test
-			// word = "elite"
+			word = "elite"
 
 			console.log(word)
 			tries = word.length + 2
